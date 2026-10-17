@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reference notes: first 3 questions</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;--bg:#000000;--fg:#ffffff;--muted:#ffffff;--line:#444444;--head:#111111;--rowlabel:#0a0a0a;--code-bg:#1c1c1c;--accent:#6cb0ff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#000000;--fg:#ffffff;--muted:#ffffff;--line:#444444;--head:#111111;--rowlabel:#0a0a0a;--code-bg:#1c1c1c;--accent:#6cb0ff}
+}
+:root[data-theme="light"],:root[data-theme="dark"]{--bg:#000000;--fg:#ffffff;--muted:#ffffff;--line:#444444;--head:#111111;--rowlabel:#0a0a0a;--code-bg:#1c1c1c;--accent:#6cb0ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{background:#000}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:20px 16px 40px}
+main{max-width:1100px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+p.sub{margin:0 0 16px;color:var(--muted)}
+.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:860px}
+th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+thead th{background:var(--head);font-weight:700;min-width:260px}
+thead th:first-child{min-width:130px}
+tbody th{background:var(--rowlabel);font-weight:700;width:130px}
+code{font:13px ui-monospace,Menlo,Consolas,monospace;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+b{color:var(--accent)}
+h2{font-size:17px;margin:24px 0 8px}
+ul{margin:0;padding-left:20px}
+li{margin:4px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Reference notes: first 3 questions</h1>
+<p class="sub">Iterative Pre-Order · Iterative Inorder · Sqrt(x)</p>
+<div class="wrap">
+<table>
+<thead>
+<tr><th></th><th>1. Iterative Pre-Order Traversal</th><th>2. Iterative Inorder Traversal</th><th>3. Sqrt(x) (LC 69)</th></tr>
+</thead>
+<tbody>
+<tr><th>Goal</th><td>Visit nodes in Root → Left → Right order without recursion</td><td>Visit nodes in Left → Root → Right order without recursion</td><td>Return floor(√x) without using a built-in sqrt</td></tr>
+<tr><th>LC equivalent</th><td>144</td><td>94</td><td>69</td></tr>
+<tr><th>Core idea</th><td>A stack simulates the recursion. Visit a node as soon as you pop it.</td><td>Go as far left as possible, then visit the node, then move to its right subtree.</td><td>Binary search on the answer. Find the largest <code>m</code> where <code>m*m &lt;= x</code>.</td></tr>
+<tr><th>Data structure</th><td>Stack of nodes</td><td>Stack of nodes plus a <code>curr</code> pointer</td><td>Two pointers, <code>lo</code> and <code>hi</code></td></tr>
+<tr><th>Steps</th>
+<td>1. If the root is null, return.<br>2. Push the root.<br>3. While the stack is non-empty: pop, visit, push right child, then push left child.</td>
+<td>1. Set <code>curr = root</code>.<br>2. While <code>curr</code> or the stack is non-empty: push <code>curr</code> and go left until null.<br>3. Pop, visit, then set <code>curr = popped.right</code>.</td>
+<td>1. Set <code>lo = 0</code>, <code>hi = x</code>.<br>2. While <code>lo &lt;= hi</code>: <code>mid = lo + (hi - lo) / 2</code>.<br>3. If <code>mid &lt;= x / mid</code>, record <code>ans = mid</code> and set <code>lo = mid + 1</code>. Otherwise set <code>hi = mid - 1</code>.<br>4. Return <code>ans</code>.</td></tr>
+<tr><th>Time</th><td>O(n)</td><td>O(n)</td><td>O(log x)</td></tr>
+<tr><th>Space</th><td>O(h), where h is the tree height</td><td>O(h)</td><td>O(1)</td></tr>
+<tr><th>Key trick</th><td>Push <b>right before left</b> so left is popped first.</td><td>The loop condition must be <code>curr != null || !stack.empty()</code>.</td><td>Compare <code>mid &lt;= x / mid</code> instead of <code>mid * mid &lt;= x</code> to avoid integer overflow.</td></tr>
+<tr><th>Common mistakes</th><td>Pushing left before right gives the wrong order. Forgetting the null-root check.</td><td>Using only <code>while (!stack.empty())</code>, which skips the start. Forgetting to move to <code>right</code> after the visit.</td><td>Overflow on <code>mid * mid</code>. Returning <code>hi</code> or <code>lo</code> incorrectly. Not handling x = 0 and x = 1.</td></tr>
+<tr><th>Edge cases</th><td>Empty tree, single node, skewed tree</td><td>Empty tree, left-skewed tree (stack grows to n)</td><td>x = 0, x = 1, x = 2147483647, perfect squares</td></tr>
+<tr><th>Useful to know</th><td>Preorder is used to copy or serialize a tree.</td><td>Inorder on a BST gives sorted order, which is the basis for Kth Smallest in BST and Validate BST.</td><td>Newton's method (<code>r = (r + x/r) / 2</code>) is an alternative that converges faster. The same pattern appears in "Search in Rotated Array" and "Find Peak Element".</td></tr>
+</tbody>
+</table>
+</div>
+<h2>Quick memory hook</h2>
+<ul>
+<li>Preorder: pop → visit → push R → push L</li>
+<li>Inorder: go left, pop → visit, go right</li>
+<li>Sqrt: binary search on the answer, comparing with division</li>
+</ul>
+</main>
+</body>
+</html>
